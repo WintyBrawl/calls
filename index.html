@@ -487,11 +487,11 @@
             <div class="call-status" id="call-status">Подключение...</div>
             <div class="video-container">
                 <div class="video-wrapper">
-                    <video id="local-video" autoplay muted></video>
+                    <video id="local-video" autoplay muted playsinline></video>
                     <div class="video-label">Вы</div>
                 </div>
                 <div class="video-wrapper">
-                    <video id="remote-video" autoplay></video>
+                    <video id="remote-video" autoplay playsinline></video>
                     <div class="video-label">Друг</div>
                 </div>
             </div>
@@ -526,7 +526,8 @@
             projectId: "kcalls",
             storageBucket: "kcalls.firebasestorage.app",
             messagingSenderId: "990117089104",
-            appId: "1:990117089104:web:278a42c037e975ebb76655"
+            appId: "1:990117089104:web:278a42c037e975ebb76655",
+            measurementId: "G-TK6GVEX9G5"
         };
 
         // Initialize Firebase
@@ -575,13 +576,16 @@
         let pendingIceCandidates = [];
         let username = '';
 
-        // Конфигурация STUN-серверов
+        // Конфигурация STUN/TURN серверов
         const configuration = {
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' }
-            ]
+                { urls: 'stun:stun2.l.google.com:19302' },
+                { urls: 'stun:stun3.l.google.com:19302' },
+                { urls: 'stun:stun4.l.google.com:19302' }
+            ],
+            iceCandidatePoolSize: 10
         };
 
         // Проверка поддержки браузером
@@ -941,6 +945,7 @@
                 
                 createPeerConnection();
                 
+                // Добавляем треки в соединение
                 localStream.getTracks().forEach(track => {
                     peerConnection.addTrack(track, localStream);
                 });
@@ -948,7 +953,10 @@
                 if (isCaller) {
                     updateCallStatus('Вызов пользователя...', 'waiting');
                     
-                    const offer = await peerConnection.createOffer();
+                    const offer = await peerConnection.createOffer({
+                        offerToReceiveAudio: true,
+                        offerToReceiveVideo: true
+                    });
                     await peerConnection.setLocalDescription(offer);
                     
                     sendMessage({
@@ -965,7 +973,10 @@
                     if (window.pendingOffer) {
                         await peerConnection.setRemoteDescription(new RTCSessionDescription(window.pendingOffer));
                         
-                        const answer = await peerConnection.createAnswer();
+                        const answer = await peerConnection.createAnswer({
+                            offerToReceiveAudio: true,
+                            offerToReceiveVideo: true
+                        });
                         await peerConnection.setLocalDescription(answer);
                         
                         sendMessage({
@@ -993,7 +1004,9 @@
         function createPeerConnection() {
             peerConnection = new RTCPeerConnection(configuration);
             
+            // Обработка входящих потоков
             peerConnection.ontrack = (event) => {
+                console.log('Получен удаленный поток:', event.streams);
                 if (event.streams && event.streams[0]) {
                     remoteVideo.srcObject = event.streams[0];
                     updateCallStatus('Соединение установлено', 'connected');
@@ -1034,6 +1047,7 @@
             };
 
             peerConnection.oniceconnectionstatechange = () => {
+                console.log('ICE состояние соединения:', peerConnection.iceConnectionState);
                 if (peerConnection.iceConnectionState === 'disconnected') {
                     updateCallStatus('Соединение потеряно', 'error');
                     setTimeout(() => endCall(), 2000);
