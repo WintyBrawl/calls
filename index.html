@@ -401,6 +401,21 @@
             background: #e81123;
         }
 
+        /* Browser Support Warning */
+        .browser-warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .browser-warning p {
+            color: #856404;
+            margin: 0;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .main-container {
@@ -435,6 +450,11 @@
 
     <!-- Firebase Status -->
     <div id="firebase-status" class="firebase-status firebase-disconnected">Firebase: Отключено</div>
+
+    <!-- Browser Support Warning -->
+    <div id="browser-warning" class="browser-warning">
+        <p><strong>Внимание:</strong> Ваш браузер может не поддерживать видеозвонки. Пожалуйста, используйте современный браузер (Chrome, Firefox, Edge) и убедитесь, что сайт открыт по HTTPS.</p>
+    </div>
 
     <!-- Main Content -->
     <div class="main-container">
@@ -541,6 +561,7 @@
         const acceptCallBtn = document.getElementById('accept-call');
         const rejectCallBtn = document.getElementById('reject-call');
         const firebaseStatus = document.getElementById('firebase-status');
+        const browserWarning = document.getElementById('browser-warning');
 
         // Переменные состояния
         let localStream = null;
@@ -562,6 +583,55 @@
                 { urls: 'stun:stun2.l.google.com:19302' }
             ]
         };
+
+        // Проверка поддержки браузером
+        function checkBrowserSupport() {
+            const supported = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+            
+            if (!supported) {
+                browserWarning.style.display = 'block';
+                console.error('Браузер не поддерживает getUserMedia');
+            }
+            
+            return supported;
+        }
+
+        // Получение доступа к медиаустройствам с обработкой ошибок
+        async function getMediaStream() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error('Ваш браузер не поддерживает доступ к камере и микрофону');
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        frameRate: { ideal: 30 }
+                    }, 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+                return stream;
+            } catch (error) {
+                console.error('Ошибка доступа к медиаустройствам:', error);
+                
+                if (error.name === 'NotAllowedError') {
+                    throw new Error('Доступ к камере и микрофону запрещен. Разрешите доступ в настройках браузера.');
+                } else if (error.name === 'NotFoundError') {
+                    throw new Error('Камера или микрофон не найдены. Убедитесь, что устройства подключены.');
+                } else if (error.name === 'NotSupportedError') {
+                    throw new Error('Ваш браузер не поддерживает видеозвонки. Попробуйте другой браузер.');
+                } else if (error.name === 'NotReadableError') {
+                    throw new Error('Не удалось получить доступ к камере или микрофону. Возможно, они уже используются другим приложением.');
+                } else {
+                    throw new Error('Неизвестная ошибка при доступе к камере и микрофону: ' + error.message);
+                }
+            }
+        }
 
         // Генерация уникального ID
         function generateUserId() {
@@ -647,6 +717,14 @@
             }
         }
 
+        // Проверка поддержки при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!checkBrowserSupport()) {
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'Браузер не поддерживается';
+            }
+        });
+
         // Вход в систему
         loginBtn.addEventListener('click', () => {
             const name = usernameInput.value.trim();
@@ -687,7 +765,6 @@
                 }
                 
             } else if (message.type === 'ice-candidate') {
-                // Исправленная обработка ICE кандидатов
                 handleIceCandidate(message.candidate);
                     
             } else if (message.type === 'reject' && isCaller) {
@@ -700,7 +777,6 @@
         function handleIceCandidate(candidateData) {
             if (!peerConnection) return;
 
-            // Убедимся, что кандидат имеет обязательные поля
             const iceCandidate = new RTCIceCandidate({
                 candidate: candidateData.candidate,
                 sdpMid: candidateData.sdpMid || '0',
@@ -739,7 +815,6 @@
                     });
             });
 
-            // Удаляем обработанные кандидаты
             pendingIceCandidates = pendingIceCandidates.filter((_, index) => 
                 !processedCandidates.includes(index)
             );
@@ -857,10 +932,8 @@
         // Начать звонок
         async function startCall() {
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: true, 
-                    audio: true 
-                });
+                // Используем исправленную функцию получения медиапотока
+                localStream = await getMediaStream();
                 
                 localVideo.srcObject = localStream;
                 showSection(callSection);
@@ -909,15 +982,7 @@
                 
             } catch (error) {
                 console.error('Ошибка при установке звонка:', error);
-                
-                if (error.name === 'NotAllowedError') {
-                    alert('Доступ к камере и микрофону запрещен. Разрешите доступ в настройках браузера.');
-                } else if (error.name === 'NotFoundError') {
-                    alert('Камера или микрофон не найдены.');
-                } else {
-                    alert('Не удалось начать звонок: ' + error.message);
-                }
-                
+                alert(error.message);
                 showSection(profileSection);
                 callBtn.disabled = false;
                 callBtn.textContent = 'Позвонить';
@@ -936,10 +1001,8 @@
                 }
             };
             
-            // Исправленная обработка ICE кандидатов при отправке
             peerConnection.onicecandidate = (event) => {
                 if (event.candidate) {
-                    // Отправляем полные данные кандидата
                     sendMessage({
                         type: 'ice-candidate',
                         candidate: {
