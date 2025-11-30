@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skype - Бесплатные видеозвонки</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <title>Video Call</title>
     <style>
         * {
             margin: 0;
@@ -19,77 +16,34 @@
             background: linear-gradient(to bottom, #e6f2ff, #cce5ff);
             color: #333;
             min-height: 100vh;
+            padding: 20px;
         }
 
-        /* Header */
-        header {
-            background: linear-gradient(to bottom, #0078d7, #005a9e);
-            color: white;
-            padding: 15px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .header-container {
-            max-width: 1200px;
+        .container {
+            max-width: 800px;
             margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .logo i {
-            font-size: 28px;
-        }
-
-        /* Main Container */
-        .main-container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-        }
-
-        /* Login Section */
-        .login-section {
             background: white;
             border-radius: 10px;
-            padding: 40px;
+            padding: 30px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        .login-section h2 {
+        h1, h2 {
             color: #0078d7;
             margin-bottom: 20px;
-            font-size: 28px;
+            text-align: center;
         }
 
-        .login-section p {
-            color: #555;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .login-section input {
+        input {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        .login-section button {
+        button {
             width: 100%;
             background: #0078d7;
             color: white;
@@ -100,162 +54,37 @@
             font-weight: bold;
             cursor: pointer;
             transition: background 0.3s;
+            margin-bottom: 10px;
         }
 
-        .login-section button:hover {
+        button:hover {
             background: #005a9e;
         }
 
-        /* Profile Section */
-        .profile-section {
-            background: white;
-            border-radius: 10px;
-            padding: 40px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            display: none;
-        }
-
-        .profile-section h2 {
-            color: #0078d7;
-            margin-bottom: 20px;
-            font-size: 28px;
-        }
-
-        .profile-section p {
-            color: #555;
-            margin-bottom: 15px;
-            line-height: 1.6;
-        }
-
-        .info-box {
-            background: #f0f8ff;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .user-id {
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: #0078d7;
-        }
-
-        .copy-btn {
-            background: #107c10;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background 0.3s;
-        }
-
-        .copy-btn:hover {
-            background: #0d600d;
-        }
-
-        .call-input {
-            width: 100%;
-            padding: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .call-btn {
-            width: 100%;
-            background: #0078d7;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-            margin-bottom: 15px;
-        }
-
-        .call-btn:hover {
-            background: #005a9e;
-        }
-
-        .logout-btn {
-            width: 100%;
-            background: #e81123;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .logout-btn:hover {
-            background: #b10e1c;
-        }
-
-        /* Call Section */
-        .call-section {
-            background: white;
-            border-radius: 10px;
-            padding: 40px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            display: none;
-            grid-column: 1 / -1;
-        }
-
-        .call-section h2 {
-            color: #0078d7;
-            margin-bottom: 20px;
-            font-size: 28px;
-            text-align: center;
-        }
-
-        .call-status {
-            text-align: center;
-            font-size: 1.2rem;
-            margin: 10px 0 30px;
-        }
-
-        .waiting {
-            color: #ff8c00;
-        }
-
-        .connected {
-            color: #107c10;
-        }
-
-        .error {
-            color: #e81123;
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
 
         .video-container {
             display: flex;
             gap: 20px;
-            margin-bottom: 30px;
+            margin: 20px 0;
             flex-wrap: wrap;
-            justify-content: center;
         }
 
         .video-wrapper {
             flex: 1;
             min-width: 300px;
-            position: relative;
             background: #000;
             border-radius: 10px;
             overflow: hidden;
-            min-height: 300px;
+            position: relative;
         }
 
         video {
             width: 100%;
-            height: 100%;
-            border-radius: 10px;
+            height: 300px;
             background: #000;
             object-fit: cover;
         }
@@ -264,37 +93,37 @@
             position: absolute;
             bottom: 10px;
             left: 10px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0,0,0,0.7);
             color: white;
             padding: 5px 10px;
             border-radius: 5px;
             font-size: 14px;
         }
 
-        .call-controls {
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .waiting { background: #fff3cd; color: #856404; }
+        .connected { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+
+        .controls {
             display: flex;
+            gap: 10px;
             justify-content: center;
-            gap: 15px;
             margin-top: 20px;
         }
 
         .control-btn {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            background: #0078d7;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .control-btn:hover {
-            background: #005a9e;
+            font-size: 18px;
         }
 
         .end-call {
@@ -305,215 +134,52 @@
             background: #b10e1c;
         }
 
-        /* Incoming Call */
-        .incoming-call {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            z-index: 1001;
-            display: none;
-        }
-
-        .incoming-call h3 {
-            margin-bottom: 15px;
-            font-size: 24px;
-        }
-
-        .incoming-call p {
-            margin-bottom: 20px;
-            font-size: 18px;
-        }
-
-        .incoming-call-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .accept-call {
-            background: #107c10;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .accept-call:hover {
-            background: #0d600d;
-        }
-
-        .reject-call {
-            background: #e81123;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .reject-call:hover {
-            background: #b10e1c;
-        }
-
-        /* Notification */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            background: #107c10;
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            display: none;
-            z-index: 1000;
-        }
-
-        /* Firebase Status */
-        .firebase-status {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            padding: 10px 15px;
-            background: #333;
-            color: white;
-            border-radius: 5px;
-            font-size: 14px;
-            z-index: 1000;
-        }
-
-        .firebase-connected {
-            background: #107c10;
-        }
-
-        .firebase-disconnected {
-            background: #e81123;
-        }
-
-        /* Browser Support Warning */
-        .browser-warning {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
+        .debug {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
             border-radius: 5px;
             padding: 15px;
-            margin: 20px 0;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .section {
             display: none;
         }
 
-        .browser-warning p {
-            color: #856404;
-            margin: 0;
-        }
-
-        /* Network Status */
-        .network-status {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px 15px;
-            background: #333;
-            color: white;
-            border-radius: 5px;
-            font-size: 14px;
-            z-index: 1000;
-            display: none;
-        }
-
-        .network-good {
-            background: #107c10;
-        }
-
-        .network-poor {
-            background: #ff8c00;
-        }
-
-        .network-bad {
-            background: #e81123;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .header-container {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .video-container {
-                flex-direction: column;
-            }
-
-            .video-wrapper {
-                min-width: 100%;
-            }
+        .active {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="header-container">
-            <div class="logo">
-                <i class="fab fa-skype"></i>
-                <span>Skype</span>
-            </div>
-        </div>
-    </header>
-
-    <!-- Firebase Status -->
-    <div id="firebase-status" class="firebase-status firebase-disconnected">Firebase: Отключено</div>
-
-    <!-- Network Status -->
-    <div id="network-status" class="network-status" style="display: none;">Сеть: Проверка...</div>
-
-    <!-- Browser Support Warning -->
-    <div id="browser-warning" class="browser-warning">
-        <p><strong>Внимание:</strong> Ваш браузер может не поддерживать видеозвонки. Пожалуйста, используйте современный браузер (Chrome, Firefox, Edge) и убедитесь, что сайт открыт по HTTPS.</p>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-container">
+    <div class="container">
         <!-- Login Section -->
-        <div class="login-section" id="login-section">
-            <h2>Введите ваше имя</h2>
-            <p>Начните общение с друзьями и семьей через бесплатные видеозвонки</p>
+        <div id="login-section" class="section active">
+            <h1>Видеозвонок</h1>
+            <p style="text-align: center; margin-bottom: 20px; color: #555;">Введите ваше имя для начала</p>
             <input type="text" id="username-input" placeholder="Ваше имя" maxlength="20">
-            <button id="login-btn">Продолжить</button>
+            <button id="login-btn">Начать</button>
         </div>
-        
+
         <!-- Profile Section -->
-        <div class="profile-section" id="profile-section">
+        <div id="profile-section" class="section">
             <h2>Добро пожаловать, <span id="username-display"></span>!</h2>
-            <p>Ваш уникальный ID для подключения:</p>
-            <div class="info-box">
-                <span id="user-id" class="user-id"></span>
-                <button id="copy-id-btn" class="copy-btn">Скопировать ID</button>
-            </div>
-            
-            <p>Чтобы позвонить другу, введите его ID:</p>
-            <input type="text" id="friend-id-input" class="call-input" placeholder="ID друга">
-            <button id="call-btn" class="call-btn">Позвонить</button>
-            <button id="logout-btn" class="logout-btn">Выйти</button>
+            <div class="status connected">Ваш ID: <strong id="user-id"></strong></div>
+            <p>Чтобы позвонить, введите ID собеседника:</p>
+            <input type="text" id="friend-id-input" placeholder="ID собеседника">
+            <button id="call-btn">Позвонить</button>
+            <button id="logout-btn" style="background: #6c757d;">Выйти</button>
         </div>
-        
+
         <!-- Call Section -->
-        <div class="call-section" id="call-section">
+        <div id="call-section" class="section">
             <h2>Видеозвонок</h2>
-            <div class="call-status" id="call-status">Подключение...</div>
+            <div id="call-status" class="status waiting">Подключение...</div>
+            
             <div class="video-container">
                 <div class="video-wrapper">
                     <video id="local-video" autoplay muted playsinline></video>
@@ -521,33 +187,24 @@
                 </div>
                 <div class="video-wrapper">
                     <video id="remote-video" autoplay playsinline></video>
-                    <div class="video-label">Друг</div>
+                    <div class="video-label">Собеседник</div>
                 </div>
             </div>
-            
-            <div class="call-controls">
-                <button id="toggle-audio" class="control-btn toggle-audio">🎤</button>
-                <button id="toggle-video" class="control-btn toggle-video">📹</button>
+
+            <div class="controls">
+                <button id="toggle-audio" class="control-btn">🎤</button>
+                <button id="toggle-video" class="control-btn">📹</button>
                 <button id="end-call" class="control-btn end-call">📞</button>
             </div>
+
+            <div class="debug" id="debug-log"></div>
         </div>
     </div>
 
-    <!-- Incoming Call -->
-    <div id="incoming-call" class="incoming-call">
-        <h3>Входящий звонок!</h3>
-        <p>От: <span id="caller-id"></span></p>
-        <div class="incoming-call-buttons">
-            <button id="accept-call" class="accept-call">Принять</button>
-            <button id="reject-call" class="reject-call">Отклонить</button>
-        </div>
-    </div>
-    
-    <!-- Notification -->
-    <div id="notification" class="notification">ID скопирован!</div>
-
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script>
-        // === Firebase Configuration ===
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDTx2Y9ctiWp26YeMmAHAxDZd_gVI_ZMdw",
             authDomain: "kcalls.firebaseapp.com",
@@ -560,14 +217,10 @@
         };
 
         // Initialize Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-        } catch (error) {
-            console.log('Firebase уже инициализирован');
-        }
+        firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Элементы DOM
+        // DOM elements
         const loginSection = document.getElementById('login-section');
         const profileSection = document.getElementById('profile-section');
         const callSection = document.getElementById('call-section');
@@ -575,7 +228,6 @@
         const loginBtn = document.getElementById('login-btn');
         const usernameDisplay = document.getElementById('username-display');
         const userIdDisplay = document.getElementById('user-id');
-        const copyIdBtn = document.getElementById('copy-id-btn');
         const friendIdInput = document.getElementById('friend-id-input');
         const callBtn = document.getElementById('call-btn');
         const logoutBtn = document.getElementById('logout-btn');
@@ -584,186 +236,93 @@
         const toggleAudioBtn = document.getElementById('toggle-audio');
         const toggleVideoBtn = document.getElementById('toggle-video');
         const endCallBtn = document.getElementById('end-call');
-        const notification = document.getElementById('notification');
         const callStatus = document.getElementById('call-status');
-        const incomingCallDiv = document.getElementById('incoming-call');
-        const callerIdSpan = document.getElementById('caller-id');
-        const acceptCallBtn = document.getElementById('accept-call');
-        const rejectCallBtn = document.getElementById('reject-call');
-        const firebaseStatus = document.getElementById('firebase-status');
-        const browserWarning = document.getElementById('browser-warning');
-        const networkStatus = document.getElementById('network-status');
+        const debugLog = document.getElementById('debug-log');
 
-        // Переменные состояния
+        // State variables
         let localStream = null;
-        let isAudioEnabled = true;
-        let isVideoEnabled = true;
-        let userId = null;
         let peerConnection = null;
-        let isCaller = false;
+        let userId = null;
         let targetUserId = null;
-        let callerId = null;
+        let isCaller = false;
         let username = '';
-        let iceCandidates = [];
 
-        // Улучшенная конфигурация STUN/TURN серверов
-        const configuration = {
+        // WebRTC configuration - максимально упрощенная
+        const rtcConfig = {
             iceServers: [
-                // Бесплатные STUN серверы
+                // Только самые надежные STUN серверы
                 { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' },
-                { urls: 'stun:stun3.l.google.com:19302' },
-                { urls: 'stun:stun4.l.google.com:19302' },
-                
-                // Бесплатные TURN серверы (могут быть ненадежными)
-                { 
-                    urls: 'turn:openrelay.metered.ca:80',
-                    username: 'openrelayproject',
-                    credential: 'openrelayproject'
-                },
-                { 
-                    urls: 'turn:openrelay.metered.ca:443',
-                    username: 'openrelayproject',
-                    credential: 'openrelayproject'
-                },
-                { 
-                    urls: 'turn:openrelay.metered.ca:443?transport=tcp',
-                    username: 'openrelayproject',
-                    credential: 'openrelayproject'
-                }
-            ],
-            iceCandidatePoolSize: 10,
-            iceTransportPolicy: 'all',
-            bundlePolicy: 'max-bundle',
-            rtcpMuxPolicy: 'require'
+                { urls: 'stun:stun1.l.google.com:19302' }
+            ]
         };
 
-        // Проверка поддержки браузером
-        function checkBrowserSupport() {
-            const supported = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-            
-            if (!supported) {
-                browserWarning.style.display = 'block';
-                console.error('Браузер не поддерживает getUserMedia');
-            }
-            
-            return supported;
+        // Debug logging
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugLog.innerHTML += `[${timestamp}] ${message}\n`;
+            debugLog.scrollTop = debugLog.scrollHeight;
+            console.log(message);
         }
 
-        // Проверка качества сети
-        function checkNetworkQuality() {
-            if (!navigator.connection) {
-                networkStatus.style.display = 'none';
-                return;
-            }
-
-            const connection = navigator.connection;
-            networkStatus.style.display = 'block';
-
-            if (connection.downlink > 5) {
-                networkStatus.textContent = 'Сеть: Отличная';
-                networkStatus.className = 'network-status network-good';
-            } else if (connection.downlink > 2) {
-                networkStatus.textContent = 'Сеть: Хорошая';
-                networkStatus.className = 'network-status network-good';
-            } else if (connection.downlink > 1) {
-                networkStatus.textContent = 'Сеть: Средняя';
-                networkStatus.className = 'network-status network-poor';
-            } else {
-                networkStatus.textContent = 'Сеть: Плохая';
-                networkStatus.className = 'network-status network-bad';
-            }
+        // Show section
+        function showSection(section) {
+            loginSection.classList.remove('active');
+            profileSection.classList.remove('active');
+            callSection.classList.remove('active');
+            section.classList.add('active');
         }
 
-        // Получение доступа к медиаустройствам
-        async function getMediaStream() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: {
-                        width: { ideal: 640, max: 1280 },
-                        height: { ideal: 480, max: 720 },
-                        frameRate: { ideal: 24, max: 30 }
-                    }, 
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true,
-                        autoGainControl: true,
-                        channelCount: 1
-                    }
-                });
-                return stream;
-            } catch (error) {
-                console.error('Ошибка доступа к медиаустройствам:', error);
-                throw error;
-            }
+        // Update call status
+        function updateStatus(message, type = 'waiting') {
+            callStatus.textContent = message;
+            callStatus.className = `status ${type}`;
         }
 
-        // Генерация уникального ID
+        // Generate user ID
         function generateUserId() {
             return 'user_' + Math.random().toString(36).substr(2, 9);
         }
 
-        // Показать уведомление
-        function showNotification(message) {
-            notification.textContent = message;
-            notification.style.display = 'block';
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, 3000);
-        }
-
-        // Обновление статуса Firebase
-        function updateFirebaseStatus(connected) {
-            if (connected) {
-                firebaseStatus.textContent = 'Firebase: Подключено';
-                firebaseStatus.className = 'firebase-status firebase-connected';
-            } else {
-                firebaseStatus.textContent = 'Firebase: Отключено';
-                firebaseStatus.className = 'firebase-status firebase-disconnected';
+        // Get media stream
+        async function getMediaStream() {
+            try {
+                log('Запрос доступа к камере и микрофону...');
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    },
+                    audio: true
+                });
+                log('Доступ к медиаустройствам получен');
+                return stream;
+            } catch (error) {
+                log('Ошибка доступа к медиаустройствам: ' + error.message);
+                throw error;
             }
         }
 
-        // Обновление статуса звонка
-        function updateCallStatus(message, type = 'waiting') {
-            callStatus.textContent = message;
-            callStatus.className = `call-status ${type}`;
-        }
-
-        // Переключение между экранами
-        function showSection(section) {
-            loginSection.style.display = 'none';
-            profileSection.style.display = 'none';
-            callSection.style.display = 'none';
-            section.style.display = 'block';
-        }
-
-        // Настройка Firebase
+        // Setup Firebase listeners
         function setupFirebase() {
-            // Слушаем статус подключения
-            database.ref('.info/connected').on('value', (snapshot) => {
-                updateFirebaseStatus(snapshot.val() === true);
-            });
-
-            // Регистрируем пользователя
+            // Set user online status
             database.ref('users/' + userId).set({
                 username: username,
                 online: true,
                 lastSeen: Date.now()
             });
 
-            // Слушаем входящие сообщения
+            // Listen for incoming messages
             database.ref('messages/' + userId).on('child_added', (snapshot) => {
                 const message = snapshot.val();
                 handleSignalingMessage(message);
                 
-                // Удаляем сообщение после обработки
+                // Remove message after processing
                 setTimeout(() => {
                     snapshot.ref.remove();
                 }, 5000);
             });
 
-            // Обновляем время последней активности
+            // Keep alive
             setInterval(() => {
                 if (userId) {
                     database.ref('users/' + userId).update({
@@ -773,31 +332,229 @@
             }, 10000);
         }
 
-        // Отправка сообщения через Firebase
+        // Send message via Firebase
         function sendMessage(message) {
             message.timestamp = Date.now();
             message.senderId = userId;
             
             if (message.targetId) {
                 database.ref('messages/' + message.targetId).push(message);
+                log(`Отправлено сообщение ${message.type} для ${message.targetId}`);
             }
         }
 
-        // Проверка поддержки при загрузке страницы
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!checkBrowserSupport()) {
-                loginBtn.disabled = true;
-                loginBtn.textContent = 'Браузер не поддерживается';
+        // Handle signaling messages
+        function handleSignalingMessage(message) {
+            log(`Получено сообщение: ${message.type} от ${message.senderId}`);
+            
+            switch (message.type) {
+                case 'offer':
+                    if (message.senderId !== userId) {
+                        handleOffer(message);
+                    }
+                    break;
+                    
+                case 'answer':
+                    if (isCaller && message.senderId === targetUserId) {
+                        handleAnswer(message);
+                    }
+                    break;
+                    
+                case 'ice-candidate':
+                    if (message.senderId === targetUserId) {
+                        handleIceCandidate(message);
+                    }
+                    break;
+                    
+                case 'reject':
+                    if (isCaller) {
+                        updateStatus('Звонок отклонен', 'error');
+                        setTimeout(endCall, 2000);
+                    }
+                    break;
             }
+        }
 
-            // Проверка качества сети
-            if (navigator.connection) {
-                navigator.connection.addEventListener('change', checkNetworkQuality);
+        // Handle offer
+        function handleOffer(message) {
+            log('Обработка входящего предложения');
+            if (confirm(`Входящий звонок от ${message.callerName || message.senderId}. Принять?`)) {
+                targetUserId = message.senderId;
+                isCaller = false;
+                startCall(message.offer);
+            } else {
+                sendMessage({
+                    type: 'reject',
+                    targetId: message.senderId
+                });
             }
-            checkNetworkQuality();
-        });
+        }
 
-        // Вход в систему
+        // Handle answer
+        function handleAnswer(message) {
+            log('Обработка ответа на звонок');
+            if (peerConnection && peerConnection.signalingState === 'have-local-offer') {
+                peerConnection.setRemoteDescription(new RTCSessionDescription(message.answer))
+                    .then(() => {
+                        log('Удаленное описание установлено');
+                        updateStatus('Соединение установлено', 'connected');
+                    })
+                    .catch(error => {
+                        log('Ошибка установки удаленного описания: ' + error);
+                    });
+            }
+        }
+
+        // Handle ICE candidate
+        function handleIceCandidate(message) {
+            log('Обработка ICE кандидата');
+            if (peerConnection) {
+                const candidate = new RTCIceCandidate(message.candidate);
+                peerConnection.addIceCandidate(candidate)
+                    .then(() => {
+                        log('ICE кандидат добавлен');
+                    })
+                    .catch(error => {
+                        log('Ошибка добавления ICE кандидата: ' + error);
+                    });
+            }
+        }
+
+        // Create peer connection
+        function createPeerConnection() {
+            log('Создание PeerConnection');
+            peerConnection = new RTCPeerConnection(rtcConfig);
+            
+            // Handle incoming stream
+            peerConnection.ontrack = (event) => {
+                log('Получен удаленный медиапоток');
+                if (event.streams && event.streams[0]) {
+                    remoteVideo.srcObject = event.streams[0];
+                    updateStatus('Соединение установлено!', 'connected');
+                }
+            };
+            
+            // Handle ICE candidates
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate && targetUserId) {
+                    log('Отправка ICE кандидата');
+                    sendMessage({
+                        type: 'ice-candidate',
+                        candidate: event.candidate,
+                        targetId: targetUserId
+                    });
+                }
+            };
+            
+            // Handle connection state changes
+            peerConnection.onconnectionstatechange = () => {
+                log('Состояние соединения: ' + peerConnection.connectionState);
+                switch(peerConnection.connectionState) {
+                    case 'connected':
+                        updateStatus('Соединение установлено!', 'connected');
+                        break;
+                    case 'disconnected':
+                    case 'failed':
+                        updateStatus('Соединение потеряно', 'error');
+                        setTimeout(endCall, 3000);
+                        break;
+                }
+            };
+            
+            // Add local tracks
+            localStream.getTracks().forEach(track => {
+                peerConnection.addTrack(track, localStream);
+            });
+            
+            log('PeerConnection создан');
+        }
+
+        // Start call
+        async function startCall(offer = null) {
+            try {
+                log('Начало звонка...');
+                
+                // Get media stream
+                localStream = await getMediaStream();
+                localVideo.srcObject = localStream;
+                
+                showSection(callSection);
+                updateStatus('Установка соединения...');
+                
+                // Create peer connection
+                createPeerConnection();
+                
+                if (isCaller) {
+                    // Create and send offer
+                    log('Создание предложения...');
+                    const offer = await peerConnection.createOffer();
+                    await peerConnection.setLocalDescription(offer);
+                    
+                    sendMessage({
+                        type: 'offer',
+                        callerId: userId,
+                        callerName: username,
+                        offer: offer,
+                        targetId: targetUserId
+                    });
+                    
+                    updateStatus('Ожидание ответа...');
+                    
+                } else if (offer) {
+                    // Handle incoming offer
+                    log('Установка удаленного описания...');
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+                    
+                    log('Создание ответа...');
+                    const answer = await peerConnection.createAnswer();
+                    await peerConnection.setLocalDescription(answer);
+                    
+                    sendMessage({
+                        type: 'answer',
+                        answer: answer,
+                        targetId: targetUserId
+                    });
+                    
+                    updateStatus('Соединение установлено!', 'connected');
+                }
+                
+            } catch (error) {
+                log('Ошибка при установке звонка: ' + error.message);
+                alert('Ошибка: ' + error.message);
+                showSection(profileSection);
+            }
+        }
+
+        // End call
+        function endCall() {
+            log('Завершение звонка');
+            
+            if (targetUserId) {
+                sendMessage({
+                    type: 'reject',
+                    targetId: targetUserId
+                });
+            }
+            
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+            }
+            
+            localVideo.srcObject = null;
+            remoteVideo.srcObject = null;
+            isCaller = false;
+            targetUserId = null;
+            
+            showSection(profileSection);
+        }
+
+        // Event listeners
         loginBtn.addEventListener('click', () => {
             const name = usernameInput.value.trim();
             if (name) {
@@ -808,189 +565,46 @@
                 
                 setupFirebase();
                 showSection(profileSection);
-                showNotification('Вы успешно вошли в систему!');
+                log('Пользователь вошел в систему: ' + username);
             } else {
                 alert('Пожалуйста, введите ваше имя');
             }
         });
 
-        // Обработка входящих сообщений
-        function handleSignalingMessage(message) {
-            console.log('Получено сообщение:', message.type, 'от', message.senderId);
-            
-            if (message.type === 'offer' && message.senderId !== userId) {
-                callerId = message.senderId;
-                callerIdSpan.textContent = message.callerName || callerId;
-                showIncomingCall();
-                window.pendingOffer = message.offer;
-                
-            } else if (message.type === 'answer' && isCaller && message.senderId === targetUserId) {
-                console.log('Получен answer от', message.senderId);
-                if (peerConnection && peerConnection.signalingState === 'have-local-offer') {
-                    peerConnection.setRemoteDescription(new RTCSessionDescription(message.answer))
-                        .then(() => {
-                            console.log('Remote description установлен успешно');
-                            updateCallStatus('Соединение установлено', 'connected');
-                            // Добавляем накопленные ICE кандидаты
-                            processPendingIceCandidates();
-                        })
-                        .catch(error => {
-                            console.error('Ошибка установки remote description:', error);
-                        });
-                }
-                
-            } else if (message.type === 'ice-candidate' && message.senderId === targetUserId) {
-                console.log('Получен ICE кандидат от', message.senderId);
-                if (peerConnection) {
-                    const candidateData = message.candidate;
-                    
-                    // Создаем объект кандидата с безопасными значениями
-                    const candidateConfig = {
-                        candidate: candidateData.candidate,
-                        sdpMid: candidateData.sdpMid || '0',
-                        sdpMLineIndex: candidateData.sdpMLineIndex !== undefined ? candidateData.sdpMLineIndex : 0
-                    };
-                    
-                    // Добавляем usernameFragment если он есть
-                    if (candidateData.usernameFragment) {
-                        candidateConfig.usernameFragment = candidateData.usernameFragment;
-                    }
-                    
-                    const iceCandidate = new RTCIceCandidate(candidateConfig);
-                    
-                    if (peerConnection.remoteDescription) {
-                        peerConnection.addIceCandidate(iceCandidate)
-                            .then(() => {
-                                console.log('ICE кандидат добавлен успешно');
-                            })
-                            .catch(error => {
-                                console.error('Ошибка добавления ICE кандидата:', error);
-                            });
-                    } else {
-                        // Сохраняем кандидаты до установки remote description
-                        iceCandidates.push(iceCandidate);
-                    }
-                }
-                    
-            } else if (message.type === 'reject' && isCaller) {
-                updateCallStatus('Звонок отклонен', 'error');
-                setTimeout(() => endCall(), 2000);
-            } else if (message.type === 'end-call') {
-                updateCallStatus('Звонок завершен', 'error');
-                setTimeout(() => endCall(), 2000);
+        callBtn.addEventListener('click', () => {
+            targetUserId = friendIdInput.value.trim();
+            if (!targetUserId) {
+                alert('Пожалуйста, введите ID собеседника');
+                return;
             }
-        }
-
-        // Обработка накопленных ICE кандидатов
-        function processPendingIceCandidates() {
-            if (!peerConnection || !peerConnection.remoteDescription) return;
             
-            iceCandidates.forEach(candidate => {
-                peerConnection.addIceCandidate(candidate)
-                    .then(() => {
-                        console.log('Ожидающий ICE кандидат добавлен');
-                    })
-                    .catch(error => {
-                        console.error('Ошибка добавления ожидающего ICE кандидата:', error);
-                    });
-            });
-            
-            iceCandidates = [];
-        }
-
-        // Показать окно входящего звонка
-        function showIncomingCall() {
-            incomingCallDiv.style.display = 'block';
-        }
-
-        // Скрыть окно входящего звонка
-        function hideIncomingCall() {
-            incomingCallDiv.style.display = 'none';
-            callerId = null;
-        }
-
-        // Принять входящий звонок
-        acceptCallBtn.addEventListener('click', async () => {
-            if (callerId) {
-                targetUserId = callerId;
-                isCaller = false;
-                hideIncomingCall();
-                await startCall();
+            if (targetUserId === userId) {
+                alert('Нельзя позвонить самому себе');
+                return;
             }
+            
+            isCaller = true;
+            startCall();
         });
 
-        // Отклонить входящий звонок
-        rejectCallBtn.addEventListener('click', () => {
-            if (callerId) {
-                sendMessage({
-                    type: 'reject',
-                    targetId: callerId
-                });
-                hideIncomingCall();
-                showNotification('Звонок отклонен');
-            }
-        });
-
-        // Копирование ID
-        copyIdBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(userId).then(() => {
-                showNotification('ID скопирован в буфер обмена!');
-            });
-        });
-
-        // Выход из системы
         logoutBtn.addEventListener('click', () => {
-            usernameInput.value = '';
             if (userId) {
                 database.ref('users/' + userId).remove();
                 database.ref('messages/' + userId).remove();
             }
             showSection(loginSection);
+            log('Пользователь вышел из системы');
         });
 
-        // Начать звонок
-        callBtn.addEventListener('click', async () => {
-            targetUserId = friendIdInput.value.trim();
-            if (!targetUserId) {
-                alert('Пожалуйста, введите ID друга');
-                return;
-            }
+        endCallBtn.addEventListener('click', endCall);
 
-            if (targetUserId === userId) {
-                alert('Нельзя позвонить самому себе');
-                return;
-            }
-
-            callBtn.disabled = true;
-            callBtn.textContent = 'Вызов...';
-
-            try {
-                isCaller = true;
-                await startCall();
-            } catch (error) {
-                console.error('Ошибка при начале звонка:', error);
-                alert('Ошибка при начале звонка: ' + error.message);
-                callBtn.disabled = false;
-                callBtn.textContent = 'Позвонить';
-            }
-        });
-
-        // Завершение звонка
-        endCallBtn.addEventListener('click', () => {
-            endCall();
-        });
-
-        // Переключение аудио/видео
         toggleAudioBtn.addEventListener('click', () => {
             if (localStream) {
                 const audioTracks = localStream.getAudioTracks();
                 audioTracks.forEach(track => {
                     track.enabled = !track.enabled;
                 });
-                isAudioEnabled = !isAudioEnabled;
-                toggleAudioBtn.textContent = isAudioEnabled ? '🎤' : '🔇';
-                toggleAudioBtn.style.backgroundColor = isAudioEnabled ? '#0078d7' : '#e81123';
-                showNotification(isAudioEnabled ? 'Микрофон включен' : 'Микрофон выключен');
+                toggleAudioBtn.textContent = audioTracks[0].enabled ? '🎤' : '🔇';
             }
         });
 
@@ -1000,198 +614,11 @@
                 videoTracks.forEach(track => {
                     track.enabled = !track.enabled;
                 });
-                isVideoEnabled = !isVideoEnabled;
-                toggleVideoBtn.textContent = isVideoEnabled ? '📹' : '📷';
-                toggleVideoBtn.style.backgroundColor = isVideoEnabled ? '#0078d7' : '#e81123';
-                showNotification(isVideoEnabled ? 'Камера включена' : 'Камера выключена');
+                toggleVideoBtn.textContent = videoTracks[0].enabled ? '📹' : '📷';
             }
         });
 
-        // Начать звонок
-        async function startCall() {
-            try {
-                // Получаем медиапоток
-                localStream = await getMediaStream();
-                
-                localVideo.srcObject = localStream;
-                showSection(callSection);
-                updateCallStatus('Установка соединения...', 'waiting');
-                
-                // Создаем PeerConnection
-                createPeerConnection();
-                
-                // Добавляем треки в соединение
-                localStream.getTracks().forEach(track => {
-                    peerConnection.addTrack(track, localStream);
-                });
-                
-                if (isCaller) {
-                    updateCallStatus('Вызов пользователя...', 'waiting');
-                    
-                    // Создаем offer
-                    const offer = await peerConnection.createOffer({
-                        offerToReceiveAudio: true,
-                        offerToReceiveVideo: true,
-                        iceRestart: false
-                    });
-                    
-                    await peerConnection.setLocalDescription(offer);
-                    
-                    // Отправляем offer
-                    sendMessage({
-                        type: 'offer',
-                        callerId: userId,
-                        callerName: username,
-                        offer: offer,
-                        targetId: targetUserId
-                    });
-
-                    showNotification('Вызов отправлен');
-
-                } else {
-                    // Принимаем входящий звонок
-                    if (window.pendingOffer) {
-                        await peerConnection.setRemoteDescription(new RTCSessionDescription(window.pendingOffer));
-                        
-                        const answer = await peerConnection.createAnswer({
-                            offerToReceiveAudio: true,
-                            offerToReceiveVideo: true
-                        });
-                        
-                        await peerConnection.setLocalDescription(answer);
-                        
-                        sendMessage({
-                            type: 'answer',
-                            answer: answer,
-                            targetId: targetUserId
-                        });
-                        
-                        updateCallStatus('Соединение установлено', 'connected');
-                        processPendingIceCandidates();
-                        delete window.pendingOffer;
-                    }
-                }
-                
-            } catch (error) {
-                console.error('Ошибка при установке звонка:', error);
-                alert('Ошибка: ' + error.message);
-                showSection(profileSection);
-                callBtn.disabled = false;
-                callBtn.textContent = 'Позвонить';
-            }
-        }
-
-        // Создание PeerConnection
-        function createPeerConnection() {
-            peerConnection = new RTCPeerConnection(configuration);
-            
-            // Обработка входящих потоков
-            peerConnection.ontrack = (event) => {
-                console.log('Получен удаленный поток:', event.streams);
-                if (event.streams && event.streams[0]) {
-                    remoteVideo.srcObject = event.streams[0];
-                    updateCallStatus('Соединение установлено', 'connected');
-                    showNotification('Видеосвязь установлена!');
-                }
-            };
-            
-            // Обработка ICE кандидатов
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate && targetUserId) {
-                    console.log('Отправка ICE кандидата');
-                    sendMessage({
-                        type: 'ice-candidate',
-                        candidate: {
-                            candidate: event.candidate.candidate,
-                            sdpMid: event.candidate.sdpMid || '0',
-                            sdpMLineIndex: event.candidate.sdpMLineIndex !== undefined ? event.candidate.sdpMLineIndex : 0,
-                            usernameFragment: event.candidate.usernameFragment || null
-                        },
-                        targetId: targetUserId
-                    });
-                }
-            };
-            
-            // Отслеживание состояния соединения
-            peerConnection.onconnectionstatechange = () => {
-                console.log('Состояние соединения:', peerConnection.connectionState);
-                switch(peerConnection.connectionState) {
-                    case 'connected':
-                        updateCallStatus('Соединение установлено', 'connected');
-                        break;
-                    case 'disconnected':
-                        updateCallStatus('Соединение прервано', 'error');
-                        break;
-                    case 'failed':
-                        updateCallStatus('Ошибка соединения', 'error');
-                        setTimeout(() => endCall(), 3000);
-                        break;
-                    case 'closed':
-                        updateCallStatus('Звонок завершен', 'error');
-                        break;
-                }
-            };
-
-            // Отслеживание ICE состояния
-            peerConnection.oniceconnectionstatechange = () => {
-                console.log('ICE состояние:', peerConnection.iceConnectionState);
-                if (peerConnection.iceConnectionState === 'failed') {
-                    console.log('ICE соединение failed');
-                    updateCallStatus('Ошибка подключения', 'error');
-                    // Пытаемся перезапустить ICE
-                    if (isCaller && peerConnection.signalingState === 'stable') {
-                        setTimeout(() => {
-                            peerConnection.restartIce();
-                        }, 1000);
-                    }
-                }
-            };
-
-            // Отслеживание gathering состояния
-            peerConnection.onicegatheringstatechange = () => {
-                console.log('ICE gathering состояние:', peerConnection.iceGatheringState);
-            };
-        }
-
-        // Завершение звонка
-        function endCall() {
-            // Отправляем сообщение о завершении звонка
-            if (targetUserId) {
-                sendMessage({
-                    type: 'end-call',
-                    targetId: targetUserId
-                });
-            }
-            
-            // Останавливаем медиапоток
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-                localStream = null;
-            }
-            
-            // Закрываем соединение
-            if (peerConnection) {
-                peerConnection.close();
-                peerConnection = null;
-            }
-            
-            // Сбрасываем состояние
-            localVideo.srcObject = null;
-            remoteVideo.srcObject = null;
-            isCaller = false;
-            targetUserId = null;
-            iceCandidates = [];
-            
-            // Восстанавливаем кнопку
-            callBtn.disabled = false;
-            callBtn.textContent = 'Позвонить';
-            
-            // Возвращаем на профиль
-            showSection(profileSection);
-            showNotification('Звонок завершен');
-        }
-
-        // Обработка закрытия страницы
+        // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
@@ -1202,20 +629,7 @@
             }
         });
 
-        // Периодическая очистка старых сообщений
-        setInterval(() => {
-            database.ref('messages').once('value').then((snapshot) => {
-                const messages = snapshot.val() || {};
-                const now = Date.now();
-                Object.keys(messages).forEach(userId => {
-                    Object.keys(messages[userId]).forEach(messageId => {
-                        if (now - messages[userId][messageId].timestamp > 30000) {
-                            database.ref('messages/' + userId + '/' + messageId).remove();
-                        }
-                    });
-                });
-            });
-        }, 30000);
+        log('Приложение загружено. Готово к работе.');
     </script>
 </body>
 </html>
