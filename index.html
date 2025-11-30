@@ -416,6 +416,32 @@
             margin: 0;
         }
 
+        /* Network Status */
+        .network-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background: #333;
+            color: white;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .network-good {
+            background: #107c10;
+        }
+
+        .network-poor {
+            background: #ff8c00;
+        }
+
+        .network-bad {
+            background: #e81123;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .main-container {
@@ -450,6 +476,9 @@
 
     <!-- Firebase Status -->
     <div id="firebase-status" class="firebase-status firebase-disconnected">Firebase: Отключено</div>
+
+    <!-- Network Status -->
+    <div id="network-status" class="network-status" style="display: none;">Сеть: Проверка...</div>
 
     <!-- Browser Support Warning -->
     <div id="browser-warning" class="browser-warning">
@@ -563,6 +592,7 @@
         const rejectCallBtn = document.getElementById('reject-call');
         const firebaseStatus = document.getElementById('firebase-status');
         const browserWarning = document.getElementById('browser-warning');
+        const networkStatus = document.getElementById('network-status');
 
         // Переменные состояния
         let localStream = null;
@@ -574,17 +604,39 @@
         let targetUserId = null;
         let callerId = null;
         let username = '';
+        let iceCandidates = [];
 
-        // Конфигурация STUN/TURN серверов
+        // Улучшенная конфигурация STUN/TURN серверов
         const configuration = {
             iceServers: [
+                // Бесплатные STUN серверы
                 { urls: 'stun:stun.l.google.com:19302' },
                 { urls: 'stun:stun1.l.google.com:19302' },
                 { urls: 'stun:stun2.l.google.com:19302' },
                 { urls: 'stun:stun3.l.google.com:19302' },
-                { urls: 'stun:stun4.l.google.com:19302' }
+                { urls: 'stun:stun4.l.google.com:19302' },
+                
+                // Бесплатные TURN серверы (могут быть ненадежными)
+                { 
+                    urls: 'turn:openrelay.metered.ca:80',
+                    username: 'openrelayproject',
+                    credential: 'openrelayproject'
+                },
+                { 
+                    urls: 'turn:openrelay.metered.ca:443',
+                    username: 'openrelayproject',
+                    credential: 'openrelayproject'
+                },
+                { 
+                    urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                    username: 'openrelayproject',
+                    credential: 'openrelayproject'
+                }
             ],
-            iceCandidatePoolSize: 10
+            iceCandidatePoolSize: 10,
+            iceTransportPolicy: 'all',
+            bundlePolicy: 'max-bundle',
+            rtcpMuxPolicy: 'require'
         };
 
         // Проверка поддержки браузером
@@ -599,19 +651,45 @@
             return supported;
         }
 
+        // Проверка качества сети
+        function checkNetworkQuality() {
+            if (!navigator.connection) {
+                networkStatus.style.display = 'none';
+                return;
+            }
+
+            const connection = navigator.connection;
+            networkStatus.style.display = 'block';
+
+            if (connection.downlink > 5) {
+                networkStatus.textContent = 'Сеть: Отличная';
+                networkStatus.className = 'network-status network-good';
+            } else if (connection.downlink > 2) {
+                networkStatus.textContent = 'Сеть: Хорошая';
+                networkStatus.className = 'network-status network-good';
+            } else if (connection.downlink > 1) {
+                networkStatus.textContent = 'Сеть: Средняя';
+                networkStatus.className = 'network-status network-poor';
+            } else {
+                networkStatus.textContent = 'Сеть: Плохая';
+                networkStatus.className = 'network-status network-bad';
+            }
+        }
+
         // Получение доступа к медиаустройствам
         async function getMediaStream() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     video: {
-                        width: { ideal: 640 },
-                        height: { ideal: 480 },
-                        frameRate: { ideal: 24 }
+                        width: { ideal: 640, max: 1280 },
+                        height: { ideal: 480, max: 720 },
+                        frameRate: { ideal: 24, max: 30 }
                     }, 
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
-                        autoGainControl: true
+                        autoGainControl: true,
+                        channelCount: 1
                     }
                 });
                 return stream;
@@ -711,6 +789,12 @@
                 loginBtn.disabled = true;
                 loginBtn.textContent = 'Браузер не поддерживается';
             }
+
+            // Проверка качества сети
+            if (navigator.connection) {
+                navigator.connection.addEventListener('change', checkNetworkQuality);
+            }
+            checkNetworkQuality();
         });
 
         // Вход в систему
@@ -747,6 +831,8 @@
                         .then(() => {
                             console.log('Remote description установлен успешно');
                             updateCallStatus('Соединение установлено', 'connected');
+                            // Добавляем накопленные ICE кандидаты
+                            processPendingIceCandidates();
                         })
                         .catch(error => {
                             console.error('Ошибка установки remote description:', error);
@@ -756,7 +842,6 @@
             } else if (message.type === 'ice-candidate' && message.senderId === targetUserId) {
                 console.log('Получен ICE кандидат от', message.senderId);
                 if (peerConnection) {
-                    // ИСПРАВЛЕННАЯ ОБРАБОТКА ICE КАНДИДАТОВ
                     const candidateData = message.candidate;
                     
                     // Создаем объект кандидата с безопасными значениями
@@ -773,13 +858,18 @@
                     
                     const iceCandidate = new RTCIceCandidate(candidateConfig);
                     
-                    peerConnection.addIceCandidate(iceCandidate)
-                        .then(() => {
-                            console.log('ICE кандидат добавлен успешно');
-                        })
-                        .catch(error => {
-                            console.error('Ошибка добавления ICE кандидата:', error);
-                        });
+                    if (peerConnection.remoteDescription) {
+                        peerConnection.addIceCandidate(iceCandidate)
+                            .then(() => {
+                                console.log('ICE кандидат добавлен успешно');
+                            })
+                            .catch(error => {
+                                console.error('Ошибка добавления ICE кандидата:', error);
+                            });
+                    } else {
+                        // Сохраняем кандидаты до установки remote description
+                        iceCandidates.push(iceCandidate);
+                    }
                 }
                     
             } else if (message.type === 'reject' && isCaller) {
@@ -789,6 +879,23 @@
                 updateCallStatus('Звонок завершен', 'error');
                 setTimeout(() => endCall(), 2000);
             }
+        }
+
+        // Обработка накопленных ICE кандидатов
+        function processPendingIceCandidates() {
+            if (!peerConnection || !peerConnection.remoteDescription) return;
+            
+            iceCandidates.forEach(candidate => {
+                peerConnection.addIceCandidate(candidate)
+                    .then(() => {
+                        console.log('Ожидающий ICE кандидат добавлен');
+                    })
+                    .catch(error => {
+                        console.error('Ошибка добавления ожидающего ICE кандидата:', error);
+                    });
+            });
+            
+            iceCandidates = [];
         }
 
         // Показать окно входящего звонка
@@ -924,7 +1031,8 @@
                     // Создаем offer
                     const offer = await peerConnection.createOffer({
                         offerToReceiveAudio: true,
-                        offerToReceiveVideo: true
+                        offerToReceiveVideo: true,
+                        iceRestart: false
                     });
                     
                     await peerConnection.setLocalDescription(offer);
@@ -959,6 +1067,7 @@
                         });
                         
                         updateCallStatus('Соединение установлено', 'connected');
+                        processPendingIceCandidates();
                         delete window.pendingOffer;
                     }
                 }
@@ -990,7 +1099,6 @@
             peerConnection.onicecandidate = (event) => {
                 if (event.candidate && targetUserId) {
                     console.log('Отправка ICE кандидата');
-                    // ИСПРАВЛЕННАЯ ОТПРАВКА ICE КАНДИДАТОВ
                     sendMessage({
                         type: 'ice-candidate',
                         candidate: {
@@ -1030,7 +1138,18 @@
                 if (peerConnection.iceConnectionState === 'failed') {
                     console.log('ICE соединение failed');
                     updateCallStatus('Ошибка подключения', 'error');
+                    // Пытаемся перезапустить ICE
+                    if (isCaller && peerConnection.signalingState === 'stable') {
+                        setTimeout(() => {
+                            peerConnection.restartIce();
+                        }, 1000);
+                    }
                 }
+            };
+
+            // Отслеживание gathering состояния
+            peerConnection.onicegatheringstatechange = () => {
+                console.log('ICE gathering состояние:', peerConnection.iceGatheringState);
             };
         }
 
@@ -1061,6 +1180,7 @@
             remoteVideo.srcObject = null;
             isCaller = false;
             targetUserId = null;
+            iceCandidates = [];
             
             // Восстанавливаем кнопку
             callBtn.disabled = false;
